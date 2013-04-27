@@ -2,3 +2,4 @@
 *.command
 .DS_Store
 *.o.dSYM
+*.swp
