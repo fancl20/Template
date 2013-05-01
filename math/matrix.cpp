@@ -3,56 +3,43 @@
 #include <algorithm>
 #include <cstring>
 using namespace std;
-template <int M>
+const int MAX = 10;
 struct mat {
   mat() { clear(); }
   void clear() { memset(ma,0,sizeof(ma)); }
-  void reg() { clear(); for(int i(0);i!=M;++i) ma[i][i] = 1; }
+  void ONE() { clear(); for(int i(0);i!=MAX;++i) ma[i][i] = 1; }
   double& get(int i,int j) { return ma[i][j]; }
-  void input() {
-    for(int i(0);i!=M;++i)
-      for(int j(0);j!=M;++j)
-        scanf("%lf",&ma[i][j]);
-  }
-  void output() {
-    for(int i(0);i!=M;++i,cout<<'\n')
-      for(int j(0);j!=M;++j)
-        printf("%.2f\t",ma[i][j]);
-  }
-  mat<M> operator+(mat<M> b) {
-    mat<M> res;
-    for(int i(0);i!=M;++i)
-      for(int j(0);j!=M;++j)
+  mat operator+(mat b) {
+    mat res;
+    for(int i(0);i!=MAX;++i)
+      for(int j(0);j!=MAX;++j)
         res.get(i,j) = get(i,j)+b.get(i,j);
     return res;
   }
-  mat<M> operator-(mat<M> b) {
-    mat<M> res;
-    for(int i(0);i!=M;++i)
-      for(int j(0);j!=M;++j)
+  mat operator-(mat b) {
+    mat res;
+    for(int i(0);i!=MAX;++i)
+      for(int j(0);j!=MAX;++j)
         res.get(i,j) = get(i,j)-b.get(i,j);
     return res;
   }
-  mat<M> operator*(mat<M> b) {
-    mat<M> res;
-    for(int i(0);i!=M;++i)
-      for(int j(0);j!=M;++j)
-        for(int k(0);k!=M;++k)
+  mat operator*(mat b) {
+    mat res;
+    for(int i(0);i!=MAX;++i)
+      for(int j(0);j!=MAX;++j)
+        for(int k(0);k!=MAX;++k)
           res.get(i,j)+=get(i,k)*b.get(k,j);
     return res;
   }
-  mat<M> pow(int n) {
-    mat<M> tmp,res;
-    tmp = *this; res.reg();
-    for(;n;tmp = tmp*tmp, n>>=1) if(n&1)
-      res = res*tmp;
+  mat pow(int n) {
+    mat tmp,res;
+    tmp = *this; res.ONE();
+    for(;n;tmp = tmp*tmp, n>>=1)
+			if(n&1) res = res*tmp;
     return res;
   }
-  double ma[M][M];
+  double ma[MAX][MAX];
 };
 int main() {
-  mat<2> ma;
-  ma.input();
-  ma.pow(2).output();
   return 0;
 }
