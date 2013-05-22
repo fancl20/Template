@@ -1,52 +1,91 @@
 #include <iostream>
-#include <cstdlib>
 #include <cstdio>
 #include <stack>
 #include <algorithm>
-#include <utility>
-#define MAX_VERTEX 100
-#define MAX_EDGE 10000
+#include <cstring>
 using namespace std;
+const int MAXV = 40000;
+const int MAXE = 400000;
 struct Edge {
-  int v,next;
-} edge[MAX_EDGE];
-int last_p(0);
-int vertex[MAX_VERTEX];
-int DFN[MAX_VERTEX],col[MAX_VERTEX];
-bool in_stack[MAX_VERTEX],choose[MAX_VERTEX];
-int T(0),last_res(0);
+  int v;
+	Edge *next;
+} edge[MAXE],*vertex[MAXV],*cur;
+int DFN[MAXV],col[MAXV],T;
+bool ins[MAXV];
 stack<int> s;
-int DFS(int u,int n) {
-  in_stack[u] = true;
+int dfs(int u) {
+  ins[u] = true;
   s.push(u);
   int low = DFN[u] = ++T;
-  for(int e(vertex[u]);e!=-1;e = edge[e].next) {
-    int v(edge[e].v);
-    if(!DFN[v])
-      low = min(low,DFS(v));
-    else if(in_stack[v])
-      low = min(low,DFN[v]);
+  for(Edge *e = vertex[u];e;e = e->next) {
+    if(!DFN[e->v])
+      low = min(low,dfs(e->v));
+    else if(ins[e->v])
+      low = min(low,DFN[e->v]);
   }
-  if(low==DFN[u]) {
+  if(low==DFN[u])
     for(int v(-1);u!=v;s.pop()) {
-      col[v = s.top()] = u;
-      in_stack[v] = false;
-      choose[u] |= choose[col[v]];
-      for(int e(vertex[v]);!choose[v] && e!=-1;e = edge[e].next)
-        choose[u] |= choose[col[edge[e].v]];
+			v = s.top();
+      col[v] = u;
+      ins[v] = false;
     }
-  }
   return low;
 }
+void init() {
+	memset(vertex,0,sizeof vertex);
+	cur = edge;
+}
 void tarjan(int n) {
-  fill_n(choose,MAX_VERTEX,false);
-  fill_n(in_stack,MAX_VERTEX,false);
-  fill_n(DFN,MAX_VERTEX,0);
-  fill_n(col,MAX_VERTEX,-1);
-  T = 0;
+	memset(ins,0,sizeof ins);
+	memset(DFN,0,sizeof DFN);
+	memset(col,0,sizeof col);
+	T = 0;
   for(int u(0);u!=n;++u)
-    if(!DFN[u]) DFS(u,n);
+    if(!DFN[u]) dfs(u);
+}
+void add(int u,int v) {
+	cur->v = v;
+	cur->next = vertex[u];
+	vertex[u] = cur++;
+}
+bool vis[MAXV];
+int val[MAXV],nval[MAXV],dp[MAXV];
+void dfs2(int u) {
+	vis[u] = true;
+	int ma(0);
+	for(Edge *e = vertex[u];e;e = e->next) {
+		if(!vis[col[e->v]]) dfs2(col[e->v]);
+		ma = max(ma,dp[col[e->v]]);
+	}
+	dp[u] = ma+nval[u];
+}
+void topsort(int n) {
+	memset(vis,0,sizeof vis);
+	for(int i(0);i!=n;++i)
+		if(!vis[col[i]]) dfs2(col[i]);
 }
 int main() {
+	int n,m;
+	while(cin>>n>>m) {
+		init();
+		for(int i(0);i!=n;++i)
+			scanf("%d",&val[i]);
+		for(int i(0);i!=m;++i) {
+			int u,v;
+			scanf("%d%d",&u,&v);
+			add(u,v);
+		}
+		tarjan(n);
+		memset(nval,0,sizeof nval);
+		for(int i(0);i!=n;++i) {
+			if(val[i]>0) nval[col[i]]+=val[i];
+			if(col[i]!=i)
+				for(Edge *e = vertex[i];e;e = e->next)
+					add(col[i],e->v);
+		}
+		memset(dp,0,sizeof dp);
+		topsort(n);
+		cout<<*max_element(dp,dp+n)<<'\n';
+	}
   return 0;
 }
