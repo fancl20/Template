@@ -7,7 +7,7 @@ const int MAXN = 110010;
 char s[MAXN*2],in[MAXN];
 int dp[MAXN*2];
 void manacher(char str[],int n) {
-	for(int i(1),r(0),id;i!=n;++i) {
+	for(int i(0),r(0),id;i!=n;++i) {
 		if(i<r) dp[i] = min(dp[id*2-i],r-i);
 		else dp[i] = 1;
 		for(int &d = dp[i];i-d>=0;++d)
