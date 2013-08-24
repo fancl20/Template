@@ -4,7 +4,7 @@
 #include <cstring>
 #define INF (0x7f7f7f7f)
 using namespace std;
-int num[40010],D[40010],F[40010];
+int num[40010],D[40010];
 int LIS(int n) {
   memset(D,0x7f,sizeof(D));
   for(int i(0);i!=n;++i)
